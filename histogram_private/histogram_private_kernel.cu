@@ -15,9 +15,9 @@
 #include <cuda_runtime.h>
 #include <iomanip>
 
-void convert_to_gray(const cv::Mat& input, cv::Mat& output);
+void histogram_private(const cv::Mat& input, cv::Mat& output);
 
-__global__ void bgr_to_gray_kernel(unsigned char* input, unsigned char* output, int width, int height, int colorWidthStep, int grayWidthStep, unsigned int *bins_d) {
+__global__ void histogram_private_kernel(unsigned char* input, unsigned char* output, int width, int height, int colorWidthStep, int grayWidthStep, unsigned int *bins_d) {
     int bx = blockIdx.x;
     int tx = threadIdx.x;
     int bdimx = blockDim.x;
@@ -43,7 +43,7 @@ __global__ void bgr_to_gray_kernel(unsigned char* input, unsigned char* output, 
     }
     if(bx > 0){
         __syncthreads();
-        for(unsigned int bin_index = (tx + bdimx*by); bin_index < 1024; bin_index+=bdimx){
+        for(unsigned int bin_index = (tx + bdimx*ty); bin_index < 1024; bin_index+=(bdimx*bdimy)){
             unsigned int bin_amount = bins_d[(bx + gridDim.x*by)*1024 + bin_index];
             if(bin_amount > 0){
                 atomicAdd(&bins_d[bin_index], bin_amount);
@@ -54,7 +54,7 @@ __global__ void bgr_to_gray_kernel(unsigned char* input, unsigned char* output, 
 }
  
  ////////////////////////////////////////////////////////////////////////////////
-void convert_to_gray(const cv::Mat& input, cv::Mat& output) {
+void histogram_private(const cv::Mat& input, cv::Mat& output) {
 	cudaEvent_t start, stop;
 	cudaEventCreate(&start);
 	cudaEventCreate(&stop);
@@ -98,7 +98,7 @@ void convert_to_gray(const cv::Mat& input, cv::Mat& output) {
 
 	cudaEventRecord(start);
 	// Launch the color conversion kernel
-	bgr_to_gray_kernel<<<grid,block>>>(input_d,output_d,input.cols,input.rows,input.step,output.step, bins_d);
+	histogram_private_kernel<<<grid,block>>>(input_d,output_d,input.cols,input.rows,input.step,output.step, bins_d);
 	
 	cudaEventRecord(stop);
 	

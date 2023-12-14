@@ -11,7 +11,7 @@ using namespace std;
 #include <opencv2/core/core.hpp>
 #include <cuda_runtime.h>
 
-void convert_to_gray(const cv::Mat& input, cv::Mat& output);
+void histogram_private(const cv::Mat& input, cv::Mat& output);
  
 int main() {
 	std::string imagePath = "snowboard.png";
@@ -28,7 +28,7 @@ int main() {
 	// Create output image
 	cv::Mat output(input.rows,input.cols,CV_8UC3);
 	// Call the wrapper function
-	convert_to_gray(input,output);
+	histogram_private(input,output);
 	// Show the input and output
 	//cv::imshow("Input",input);
 	//cv::imshow("Output",output);
