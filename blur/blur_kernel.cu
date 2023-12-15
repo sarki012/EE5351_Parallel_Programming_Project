@@ -96,7 +96,14 @@ void blur(const cv::Mat& input, cv::Mat& output) {
 	// Calculate grid size to cover the whole image
 	const dim3 grid((input.cols + block.x - 1)/block.x, (input.rows + block.y - 1)/block.y);
 	
-	float M[5][5] = {{1,1,1,1,1}, {1,1,1,1,1}, {1,1,1,1,1}, {1,1,1,1,1}, {1,1,1,1,1}};
+	//float M[5][5] = {{1,4,7,4,1}, {4,16,26,16,4}, {7,26,41,26,7}, {4,16,26,16,4}, {1,4,7,4,1}};
+	float M[5][5] = {{1,4,7,4,1}, {4,16,26,16,4}, {7,26,41,26,7}, {4,16,26,16,4}, {1,4,7,4,1}};
+	
+	for(int m = 0; m < 5; m++){
+		for(int n = 0; n < 5; n++){
+			M[m][n] = M[m][n] / 256;
+		}
+	}
 	
 	cudaMemcpyToSymbol(Mc, M, ((KERNEL_SIZE * KERNEL_SIZE)*sizeof(float)));
 
