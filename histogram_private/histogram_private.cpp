@@ -17,7 +17,7 @@ int main() {
 	std::string imagePath = "snowboard.png";
 
 	// Read input image from the disk
-	cv::Mat input = cv::imread(imagePath);
+	cv::Mat input = cv::imread(imagePath, IMREAD_GRAYSCALE);
 
 	if(input.empty()){
 		std::cout<<"Image Not Found!"<<std::endl;
@@ -26,7 +26,7 @@ int main() {
 	}
 
 	// Create output image
-	cv::Mat output(input.rows,input.cols,CV_8UC3);
+	cv::Mat output(input.rows,input.cols,CV_8UC1);
 	// Call the wrapper function
 	histogram_private(input,output);
 	// Show the input and output
