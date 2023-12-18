@@ -86,10 +86,11 @@ void blur(const cv::Mat& input, cv::Mat& output) {
 	cudaMemcpy(input_d,input.ptr(),colorBytes,cudaMemcpyHostToDevice);
 
 	// Specify a reasonable block size
-	const dim3 block(16,16);
+	const dim3 block(16,16, 1);
 
 	// Calculate grid size to cover the whole image
-	const dim3 grid((input.cols + block.x - 1)/block.x, (input.rows + block.y - 1)/block.y);
+	//const dim3 grid((int)(ceil((double)(input.cols + block.x - 1)/block.x)), (int)(ceil((double)(input.rows + block.y - 1)/block.y)));
+	const dim3 grid(((input.cols + block.x - 1)/block.x), ((input.rows + block.y - 1)/block.y), 1);
 	
 	// the 2D array variable is declared to be `int **` (a pointer to an int *)
 	// a dynamically allocated array of dynamically allocated int arrays
